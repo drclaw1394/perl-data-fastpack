@@ -32,14 +32,37 @@ sub size_message {
 my $pbuf= pack "x8";
 
 
+=over 
+
+=item encode_message
+
+=item encode_fastpack
+
+Encodes an array of fast pack message structures into an buffer
+
+Buffer is aliased and is an in/out parameter. Encoded data is appended to the buffer.
+
+Inputs is an array of message structure (also array refs). Array is consumed 
+
+An optional limit can be sepecified on how many messages to encode in a single call
+
+Returns the number of bytes encoded
+
+
+=back
+
+=cut
+
 sub encode_message {
   \my $buf=\$_[0]; shift;
   my $inputs=shift;
   my $limit=shift;
 
   $limit//=@$inputs;
+  my $bytes=0;
   my $processed=0;
 	my $padding;
+  my $tmp;
   
   my $flags=0;
 
@@ -48,13 +71,43 @@ sub encode_message {
     $padding= 8-$padding  if $padding;
 
 		my $s=pack("d V V/a*", @$_);
-		$buf.=$s.substr $pbuf, 0, $padding;
-    next if ++$processed == $limit;
+    $tmp=$s.substr $pbuf, 0, $padding;
+    $bytes+=length $tmp;
+		$buf.=$tmp;
+    last if ++$processed == $limit;
 	}
-  $processed;	
+  # Remove the messages from the input array
+  splice @$inputs, 0, $processed;
+  
+  $bytes;	
 }
 
 # Decode a message from a buffer. Buffer is aliased
+=over
+
+=item decode_message
+
+=item decode_fastpack
+
+Consumes data from an input buffer and decodes it into 0 or more messages.
+Buffer is aliased and is an in/out parameter
+Decoded messages are added to the dereferenced output array
+An optional limit of message count can be specified.
+
+Returns the number of bytes consumed during decoding. I a message could not be
+decoded, 0 bytes are consumed.
+
+  buffer (aliased) 
+  output (array ref)
+  limit (numeric)
+
+  return (byte count)
+
+
+=back 
+
+=cut
+
 sub decode_message {
   \my $buf=\$_[0]; shift;
   my $output=shift;

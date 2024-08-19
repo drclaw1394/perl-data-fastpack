@@ -9,6 +9,7 @@ use Data::FastPack;
 
 my $buffer="";
 my @input=([0, 1, "a"x7],[0,23,"b" x 7]);
+my @input_copy=@input;
 encode_message($buffer, \@input);
 
 # Ensure padding is correct
@@ -23,13 +24,13 @@ my $byte_count=decode_message($buffer, \@output, $limit);
 #say STDERR Dumper @output;
 ok length($buffer)==0, "Length ok";
 
-ok @input==@output, "Same message count";
+ok @input_copy==@output, "Same message count";
 
 # Test decoded messages are identical
-for(0..$#input){
-  $input[$_][0]==$output[$_][0];
-  $input[$_][1]==$output[$_][1];
-  $input[$_][2] eq $output[$_][2];
+for(0..$#input_copy){
+  $input_copy[$_][0]==$output[$_][0];
+  $input_copy[$_][1]==$output[$_][1];
+  $input_copy[$_][2] eq $output[$_][2];
 }
 
 
