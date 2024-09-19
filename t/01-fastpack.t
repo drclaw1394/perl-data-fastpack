@@ -5,6 +5,8 @@ use Test::More;
 
 
 use Data::FastPack;
+use Data::FastPack::Meta;
+
 #use Data::Dumper;
 
 my $buffer="";
