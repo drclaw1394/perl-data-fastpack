@@ -1,5 +1,8 @@
-use 5.024000;
 use ExtUtils::MakeMaker;
+
+use File::ShareDir::Install;
+install_share dist=>"share";
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -15,3 +18,7 @@ WriteMakefile(
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
     LICENSE           => 'mit',
 );
+
+package MY;
+use File::ShareDir::Install qw(postamble);
+
