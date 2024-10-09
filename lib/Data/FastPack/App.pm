@@ -28,7 +28,7 @@ sub add_to_jpack_container {
   my $jpack=Data::JPack->new(jpack_compression=>"DEFLATE", jpack_type=>"app", html_container=>$html_container);
 
 
-  $jpack->set_prefix("app/jpack");
+  $jpack->set_prefix("app/jpack/main");
 
   my @outputs;
   for(js_paths){

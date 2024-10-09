@@ -15,7 +15,7 @@ my $html_container//=tempdir(CLEANUP=>1);
 
 Data::FastPack::App::add_to_jpack_container $html_container;
 
-my $prefix="app/jpack";
+my $prefix="app/jpack/main";
 
 ok -e "$html_container/$prefix/00000000000000000000000000000000/00000000000000000000000000000000.jpack";
 
