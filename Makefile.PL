@@ -17,6 +17,20 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Data/FastPack.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
     LICENSE           => 'mit',
+    META_ADD => {
+      "meta-spec" => {
+        version => 2
+      },
+      resources=> {
+        repository =>{
+          type => "git",
+          url => "git://github.com/drclaw1394/perl-data-fastpack.git",
+          web => "https://github.com/drclaw1394/perl-data-fastpack",
+        }
+      }
+    }
+
+
 );
 
 package MY;
