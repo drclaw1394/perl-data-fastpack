@@ -30,9 +30,9 @@ ok @input_copy==@output, "Same message count";
 
 # Test decoded messages are identical
 for(0..$#input_copy){
-  $input_copy[$_][0]==$output[$_][0];
-  $input_copy[$_][1]==$output[$_][1];
-  $input_copy[$_][2] eq $output[$_][2];
+  ok $input_copy[$_][0]==$output[$_][0];
+  ok $input_copy[$_][1]==$output[$_][1];
+  ok $input_copy[$_][2] eq $output[$_][2];
 }
 
 
