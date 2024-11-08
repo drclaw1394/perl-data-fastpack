@@ -13,6 +13,8 @@ WriteMakefile(
       "constant::more"=>0,
       "Cpanel::JSON::XS"=>0,
       "Data::MessagePack"=>0,
+      "File::ShareDir::Install"=>0,
+      "File::ShareDir"=>0,
     },
     ABSTRACT_FROM     => 'lib/Data/FastPack.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
