@@ -10,11 +10,11 @@ Provides basic encoding and decoding functions.
 =head1 FASTPACK FORMAT SUMMARY
 
 FastPack format is a binary format for storing records of opaque data related
-to a time index into a stream, padded to a multiple of 89 bytes. Within each
+to a time index into a stream, padded to a multiples of 8 bytes. Within each
 stream of data, an ID refers to a channel of data. All multi byte fields are in
 little endian byte order processing unless otherwise indicated by the
-description/metadata. The fields
-of a message are:
+description/metadata specified at higher stack levels. The fields of a message
+are:
 
   time(double float)  # 8 byte aligned
   id(32)              # uint32
@@ -32,6 +32,10 @@ browsers to utilise high resolution time, as they do not support 64bit integers.
 C<id> is is the channel id within the file/stream. It relates to a definition
 file. 0 indicates a meta data point which is JSON or other structured data,
 which alters the processing of the file. 
+
+Optionally a namespace can be used to provide dynamic ID generation. The ids
+are mapped from a name/label/topic/ to an integer. Additional mapping messages
+are inserted into the stream to facilitate this mapping at both ends.
 
 C<len> is the length of the payload. If the length is larger than 2^32 then it
 must be fragmented at the 'application level'.
@@ -151,6 +155,120 @@ as long as the encoded values are are map or array types.
 
 It is recommended that general structured data in other message ids also either
 JSON or MessagePack also.
+
+
+=head1 Named IDs
+
+Static IDs are simple for small closes systems. However for larger system,
+using dynamic is allows the scoping.  The mapping between names and IDS it
+automatically applied whtn using a name space. Encoding a named id for the
+first time in insert a entry in the local ecoding side table. It will also
+inject a message with  the dynamic id and payload of the name into the stream.
+This will be the first time this id is seen, and is a marker to update the
+decoding end of the system.
+
+If a named message with no payload is encoded, this serves as a deregistration
+of the id and adds it to a pool of reusable ids.
+
+For a bidirectional link, 4 name spaces are acutally use. The encoding end of
+each direction is the master in that direction. The ids likely don't match, but
+they don't need to. The decoding end of each direction is shadow/slave copy of
+the encoding table. Over a reliable transport, these tables will always be in
+sync with the master from th encoding end. 
+
+=head1 API Usage
+
+=head2 Encoding and Decoding
+
+=head3 encode_fastpack
+
+  encode_fastpack $buf, $inputs, $limit, $namespace
+
+
+Encodes and array ref of an array refs C<[time, ID, payload]> in to the buffer
+C<$buf>.  C<$buf> is aliased interally, and not copied. All need encoded
+messages are appended to the buffer.
+
+If C<limit> is supplied, and less then the length of the C<$input>
+array, only this number of inputs will be consumed.  Inputs consumed are
+spliced out of the input array to allow the same array to be appedend to
+externally
+
+If C<$namespace> is provided, all messages are encoded assuming the id is name
+and dynamically allocates an ID to the name space.  Note C<$limit> must be
+provided  (even if undefinded) to use this argument.
+
+Namespace if prevented from using C<0>, C<"0">, or C<undef> as names. Messages
+with these names issue a warning.
+
+
+
+=head3 decode_fastpack
+
+  decode_fastpack $buf,$output, $limit, $namespace
+
+
+Decodes fastpack messages from C<$buf>, consuming it as it progresses. C<$buf>
+is aliases so new messages can be added to it externally.
+
+C<$output> is a reference to an array to store the decoded messages. The
+messages are decoded into  C<[time, id, payload]>.
+
+If C<$limit> is provided, this is the maximum number of messages to decode
+during a single call. If not provided or undef, 4096 is the default.
+
+
+C<$namespace> if provided enables named ids. decoded messages have the id
+mapped to a name stored in the names space. Special namespace update messages
+maniupulate the namespace table to ensure it is copy of the  encoding end of
+the stream
+
+
+=head2 Namspaces
+
+=head3 create_namespace
+
+  create_namespace
+
+Returns a name space structure for named ids. Seperate name spaces structure
+are needed for encoding and decoding ends, even withing the same program.
+
+
+=head3 id_for_name
+
+  id_for_name $namespace, $name
+
+Returns the integer id in C<$namespace> for  C<$name>. Useful for testing and
+optimisation when multiple of the same messages are being encoded.
+
+=head3 name_for_id
+
+  name_for_id $namespace, $id
+
+Returns the name id in C<$namespace> for  C<$id>. Useful for testing and
+optimisation when multiple of the same messages are being encoded.
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 REPOSITORTY and BUGS
+
+Please report any bugs via git hub: L<http://github.com/drclaw1394/perl-data-fastpack>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Ruben Westerberg
+
+Licensed under MIT
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
 
 =cut
 
