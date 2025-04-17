@@ -11,6 +11,7 @@ README.md
 share/js/01-fastpack.js
 share/js/fastpack-test.js
 share/js/msgpack.min.js
+share/js/test.html
 t/01-fastpack.t
-t/02-app.t
 t/02-app.t.dis
+t/03-name.t
