@@ -1,11 +1,12 @@
 =head1 NAME 
 
-Data::FastPack - FastPack Record format, parsing and serialising module
+Data::FastPack - FastPack Record format, Parsing and Serialising
 
 =head1 DESCRIPTION 
 
 Implements an incremental parser to parse an incoming buffer into messages.
-Provides basic encoding and decoding functions.
+Provides basic encoding and decoding functions to serialize messages.
+
 
 =head1 FASTPACK FORMAT SUMMARY
 
@@ -55,7 +56,7 @@ a sensor to position where both the sensor and the position are sampled
 separately, but can be stored with the same time base.
 
 There is only one reserved channel id, 0 , which is a meta data channel. This
-channel is JSON or message pack, and provides the meta/header data to control
+channel is JSON or MessagePack, and provides the meta/header data to control
 the stream from that point forward.
 
 The meta data semantics are application dependant, giving great flexibility, in
@@ -112,16 +113,15 @@ time base factor to generate the actual time.
 =item * Argument/index into a timing function.
 
 The value is used as an index into a timing function stored in external
-JavaScript, which when called calculates a time. ie for processing video with
+JavaScript, which when called calculates a time. i.e. for processing video with
 fixed non integer frame rates
 
 =back
 
 For a system reporting only a single message, the time field will constantly be
-updated for each message. However with multiple channels (eg, gamma, caliper,
-lsd, ssd), only the first message from the group will have a non zero time when
-using difference mode.  Most messages in a system will have a 0 time because of
-this. 
+updated for each message. However with multiple channels only the first message
+from the group will have a non zero time when using difference mode.  Most
+messages in a system will have a 0 time because of this. 
 
 =head2 Padding
 
@@ -150,31 +150,31 @@ structure
 This gives the fast encoding/decoding of simple time series values and the
 ability to have arbitrarily complex data when required
 
-Decoding of meta data automatically picks MesagePack or JSON as required,
+Decoding of meta data automatically picks MessagePack or JSON as required,
 as long as the encoded values are are map or array types.
 
 It is recommended that general structured data in other message ids also either
 JSON or MessagePack also.
 
 
-=head1 Named IDs
+=head1 NAMED IDs
 
-Static IDs are simple for small closes systems. However for larger system,
-using dynamic is allows the scoping.  The mapping between names and IDS it
-automatically applied whtn using a name space. Encoding a named id for the
-first time in insert a entry in the local ecoding side table. It will also
-inject a message with  the dynamic id and payload of the name into the stream.
-This will be the first time this id is seen, and is a marker to update the
-decoding end of the system.
+Static IDs are simple for small closed systems. However for larger system,
+using dynamic ids allows the scoping.  The mapping between names and ids is
+automatically applied when using a name space. Encoding a named id for the
+first time will in insert a entry in the local encoding side table. It will
+also inject a message with  the dynamic id and payload of the name into the
+stream.  This will be the first time this id is seen, and is a marker to update
+the decoding end of the system.
 
-If a named message with no payload is encoded, this serves as a deregistration
+If a named message with no payload is encoded, this serves as a de registration
 of the id and adds it to a pool of reusable ids.
 
-For a bidirectional link, 4 name spaces are acutally use. The encoding end of
+For a bidirectional link, 4 name spaces are actually use. The encoding end of
 each direction is the master in that direction. The ids likely don't match, but
 they don't need to. The decoding end of each direction is shadow/slave copy of
 the encoding table. Over a reliable transport, these tables will always be in
-sync with the master from th encoding end. 
+sync with the master from the encoding end. 
 
 =head1 API Usage
 
@@ -186,17 +186,17 @@ sync with the master from th encoding end.
 
 
 Encodes and array ref of an array refs C<[time, ID, payload]> in to the buffer
-C<$buf>.  C<$buf> is aliased interally, and not copied. All need encoded
+C<$buf>.  C<$buf> is aliased internally, and not copied. All need encoded
 messages are appended to the buffer.
 
 If C<limit> is supplied, and less then the length of the C<$input>
 array, only this number of inputs will be consumed.  Inputs consumed are
-spliced out of the input array to allow the same array to be appedend to
+spliced out of the input array to allow the same array to be appended to
 externally
 
 If C<$namespace> is provided, all messages are encoded assuming the id is name
 and dynamically allocates an ID to the name space.  Note C<$limit> must be
-provided  (even if undefinded) to use this argument.
+provided  (even if undefended) to use this argument.
 
 Namespace if prevented from using C<0>, C<"0">, or C<undef> as names. Messages
 with these names issue a warning.
@@ -208,7 +208,7 @@ with these names issue a warning.
   decode_fastpack $buf,$output, $limit, $namespace
 
 
-Decodes fastpack messages from C<$buf>, consuming it as it progresses. C<$buf>
+Decodes FastPack messages from C<$buf>, consuming it as it progresses. C<$buf>
 is aliases so new messages can be added to it externally.
 
 C<$output> is a reference to an array to store the decoded messages. The
@@ -220,8 +220,8 @@ during a single call. If not provided or undef, 4096 is the default.
 
 C<$namespace> if provided enables named ids. decoded messages have the id
 mapped to a name stored in the names space. Special namespace update messages
-maniupulate the namespace table to ensure it is copy of the  encoding end of
-the stream
+manipulate the namespace table to ensure it is copy of the  encoding end of the
+stream
 
 
 =head2 Namspaces
@@ -230,7 +230,7 @@ the stream
 
   create_namespace
 
-Returns a name space structure for named ids. Seperate name spaces structure
+Returns a name space structure for named ids. Separate name spaces structure
 are needed for encoding and decoding ends, even withing the same program.
 
 
@@ -259,7 +259,7 @@ Please report any bugs via git hub: L<http://github.com/drclaw1394/perl-data-fas
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2025 by Ruben Westerberg
 
 Licensed under MIT
 

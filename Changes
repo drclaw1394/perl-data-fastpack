@@ -2,7 +2,6 @@ Revision history for Perl extension Data::FastPack.
 
 v0.2.0 2025-01-01
   [improvments]
-    - updated to use $jpack->encode_file;
     - now supports optiional named ids and automatic/dynamic message id selection
     - added API for creating namespaces for named ids
     - added POD for APIs
