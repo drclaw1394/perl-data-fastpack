@@ -130,7 +130,7 @@ sub encode_message {
     }
     $i=0;
     for(@$inputs){
-      $padding=((length $_->[FP_MSG_PAYLOAD]//"")%8);
+      $padding=((length($_->[FP_MSG_PAYLOAD]//""))%8);
       $padding= 8-$padding  if $padding;
 
       my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD]//"" );
@@ -155,20 +155,6 @@ sub encode_message {
 
   }
 
-  ################################################################################################
-  # # Do normal encoding                                                                         #
-  # $i=0;                                                                                        #
-  #       for(@$inputs){                                                                         #
-  #               $padding=((length $_->[FP_MSG_PAYLOAD])%8);                                    #
-  #   $padding= 8-$padding  if $padding;                                                         #
-  #                                                                                              #
-  #               my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD] ); #
-  #   $tmp=$s.substr $pbuf, 0, $padding;                                                         #
-  #   $bytes+=length $tmp;                                                                       #
-  #               $buf.=$tmp;                                                                    #
-  #   last if ++$processed == $limit;                                                            #
-  #       }                                                                                      #
-  ################################################################################################
   # Remove the messages from the input array
   splice @$inputs, 0, $processed;
   
