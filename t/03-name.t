@@ -76,7 +76,7 @@ use Data::FastPack;
 
 
   encode_fastpack $buffer, [[0, 0, undef]], undef, $ns;
-print STDERR "----- ". keys($ns->[N2E]->%*)."\n\n";
+  print STDERR "----- ". keys($ns->[N2E]->%*)."\n\n";
 
   # Should name no key
   

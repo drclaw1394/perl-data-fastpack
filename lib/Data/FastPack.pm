@@ -90,8 +90,8 @@ sub encode_message {
         my $id=$ns->[N2E]{$name};
 
         if(!defined $id){
-          DEBUG and print STDERR __PACKAGE__ . "id/name does NOT existes in table: $id\n";
-          DEBUG and print STDERR __PACKAGE__ . "first payload is name... so we want to send/register\n";
+          DEBUG and print STDERR $$.__PACKAGE__ . "id for name $name does NOT existes in table: $id\n";
+          DEBUG and print STDERR $$.__PACKAGE__ . "first payload is name... so we want to send/register\n";
           # Update id tracking and lookup tables
           $id=pop($ns->[FREE_ID]->@*)//$ns->[NEXT_ID]++;
           $ns->[N2E]{$name}=$id;
