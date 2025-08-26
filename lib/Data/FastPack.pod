@@ -167,8 +167,10 @@ also inject a message with  the dynamic id and payload of the name into the
 stream.  This will be the first time this id is seen, and is a marker to update
 the decoding end of the system.
 
-If a named message with no payload is encoded, this serves as a de registration
-of the id and adds it to a pool of reusable ids.
+If a named message with no payload encoded, this serves as a deregistration of
+the id and adds it to a pool of reusable ids.
+
+A mesage with id 0 and and no payload, deregisters all (clears) the name space.
 
 For a bidirectional link, 4 name spaces are actually use. The encoding end of
 each direction is the master in that direction. The ids likely don't match, but

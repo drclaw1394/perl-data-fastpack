@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::FastPack.
 
+v0.2.2 2025-08-26
+  [fixes]
+  - Namespace reset message added
+  - Updated pod
+
 v0.2.1 2025-06-24
   [fixes]
   - fixed action at a distance when encoding messages

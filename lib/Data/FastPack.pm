@@ -121,7 +121,13 @@ sub encode_message {
         #$_->[FP_MSG_ID]=$id;
       }
       else {
-        $_ids[$i++]=$_[FP_MSG_ID];
+        unless(defined $_->[FP_MSG_PAYLOAD]){
+           # No payload, and 0 id, and name space active...
+           # This is a name space reset message
+           $ns->[N2E]->%*=();
+           $ns->[I2E]->%*=();
+        }
+        $_ids[$i++]=$_->[FP_MSG_ID];
         # If the msg id is 0 this  is passed thourgh un modified and not name translated. 
         #
         #warn 'FastPack encode: Ignoring message. Named FastPack Messages cannot be named 0 or "0" or undefined';
@@ -227,38 +233,53 @@ sub decode_message {
     substr($buf, 0, $total,"");
 
     # Process name space definitions and lookups
-    if($ns and $message[FP_MSG_ID]){
-      
-      # This is a non system message which needs conversion 
-      my $id=$message[FP_MSG_ID];
-      my $name= $ns->[I2E]{$id};
-      unless($name){
-        DEBUG and print STDERR __PACKAGE__ . " message id has not been seen before: $id\n";
-        # This id has not been seen before. so we know the payload it the name
-        $name=$message[FP_MSG_PAYLOAD];
-        DEBUG and print STDERR __PACKAGE__ . " use payload ans name: $name\n";
-        $ns->[I2E]{$id}=$name;
-        $ns->[N2E]{$name}=$id;
-      }
-      else {
-        DEBUG and print STDERR __PACKAGE__ . " message name exisits: $name\n";
-        if($message[FP_MSG_PAYLOAD]){
-          DEBUG and print STDERR __PACKAGE__ . " has payload.. process as normal. push to output\n";
-          # only push the message to output if this code has been seen before
-          push @$output, \@message;
-          # Finally convert id to name as we asked for named message
-          $message[FP_MSG_ID]=$name;
+    if($ns ){
+      #print STDERR __PACKAGE__. "-------- ID of $message[FP_MSG_ID]=> $message[FP_MSG_PAYLOAD]\n";
+      if($message[FP_MSG_ID]){
+
+        # This is a non system message which needs conversion 
+        my $id=$message[FP_MSG_ID];
+        my $name= $ns->[I2E]{$id};
+        unless($name){
+          DEBUG and print STDERR __PACKAGE__ . " message id has not been seen before: $id\n";
+          # This id has not been seen before. so we know the payload it the name
+          $name=$message[FP_MSG_PAYLOAD];
+          DEBUG and print STDERR __PACKAGE__ . " use payload ans name: $name\n";
+          $ns->[I2E]{$id}=$name;
+          $ns->[N2E]{$name}=$id;
         }
         else {
-          DEBUG and print STDERR __PACKAGE__ . " has NO payload.. un register and do no push to ouput\n";
-          delete $ns->[N2E]{$name};
-          delete $ns->[I2E]{$id};
-          #push $ns->[FREE_ID]->@*, $id;
+          DEBUG and print STDERR __PACKAGE__ . " message name exisits: $name\n";
+          if($message[FP_MSG_PAYLOAD]){
+            DEBUG and print STDERR __PACKAGE__ . " has payload.. process as normal. push to output\n";
+            # only push the message to output if this code has been seen before
+            push @$output, \@message;
+            # Finally convert id to name as we asked for named message
+            $message[FP_MSG_ID]=$name;
+          }
+          else {
+            DEBUG and print STDERR __PACKAGE__ . " has NO payload.. un register and do no push to ouput\n";
+            delete $ns->[N2E]{$name};
+            delete $ns->[I2E]{$id};
+            #push $ns->[FREE_ID]->@*, $id;
+          }
+        }
+      }
+      else {
+        #id of 0
+        unless($message[FP_MSG_PAYLOAD]){
+          # no payload, and 0 id,, reset name space, and consume message
+          $ns->[I2E]->%*=();
+          $ns->[N2E]->%*=();
+        }
+        else {
+          push @$output, \@message;
         }
       }
     }
     else {
-     push @$output, \@message;
+      # Direct pass through if no name space used
+      push @$output, \@message;
     }
   }
   $byte_count;

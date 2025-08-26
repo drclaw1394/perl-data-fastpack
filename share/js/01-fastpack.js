@@ -86,19 +86,23 @@
 
             }
             else {
-              // No zero payload, .. normal message
-              
+              // Non zero payload, .. normal message
+
             }
           }
-
-            //Translate
-            ids[i]=id;
-          }
-          else {
-            // No namespace so no translation
-            ids[i]=args.inputs[i].id;
-          }
+          //Translate
+          ids[i]=id;
         }
+        else {
+          if(args.inputs[i].payload.length==0){
+            // Id of 0, and no payload, clear entire namespace
+            Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
+            Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
+          }
+          // No namespace so no translation
+          ids[i]=args.inputs[i].id;
+        }
+      }
 
       }
 
@@ -198,27 +202,37 @@
         offset+=padding+_len;
 
 
-        if(ns && scan.id){
-          let id=scan.id;
-          let name=ns.i2e[id];
-          if(name == undefined){
-            // Id has not been seen before. use payload as name
-            name=utf8decoder.decode(scan.payload);
-            ns.i2e[id]=name;
-            ns.n2e[name]=id;
-          }
-          else {
-            if(scan.payload.length){
-              // Id seen previously. Only push if payload is non emply
-              args.outputs.push(scan);
-              scan.id=name;
+        if(ns ){
+          if(scan.id){
+            let id=scan.id;
+            let name=ns.i2e[id];
+            if(name == undefined){
+              // Id has not been seen before. use payload as name
+              name=utf8decoder.decode(scan.payload);
+              ns.i2e[id]=name;
+              ns.n2e[name]=id;
             }
             else {
-              // No payload remove the id/name from the tables, do not pass on message
-              delete ns.n2e[name];
-              delete ns.i2e[id];
-              //ns.free_id.push(id);
+              if(scan.payload.length){
+                // Id seen previously. Only push if payload is non emply
+                args.outputs.push(scan);
+                scan.id=name;
+              }
+              else {
+                // No payload remove the id/name from the tables, do not pass on message
+                delete ns.n2e[name];
+                delete ns.i2e[id];
+                //ns.free_id.push(id);
+              }
             }
+          }
+          else {
+            if(scan.payload.length==0){
+              // Id of 0, and no payload, clear entire namespace
+              Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
+              Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
+            }
+
           }
         }
         else {
