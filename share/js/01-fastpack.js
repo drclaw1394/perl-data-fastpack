@@ -62,7 +62,6 @@
           let id=ns.n2e[name];
           if(id == undefined){
             //id/code...  NOT FOUND... Register if payload has length!
-            if(args.inputs[i].payload.length){
               //Update id tracking and lookup tables
               id=ns.free_id.pop()||ns.next_id++;
               ns.n2e[name]=id;
@@ -71,24 +70,6 @@
               let new_arg={buffer: buffer, inputs:[{time: args.inputs[i].time, id: id, payload: utf8encoder.encode(name) }]};
               temp=encode_message(new_arg);
               buffer=new_arg.buffer;
-            }
-            else {
-              // No length in payload.. ignore
-            }
-          }
-          else {
-            if(args.inputs[i].payload.length==0){
-              //Defined id, but no payload... so this means name seen before and we need to  unreg
-              delete ns.n2e[name];
-              delete ns.i2e[id];
-              //Push free id as we are encoding side
-              ns.free_id.push(id); 
-
-            }
-            else {
-              // Non zero payload, .. normal message
-
-            }
           }
           //Translate
           ids[i]=id;
@@ -98,6 +79,8 @@
             // Id of 0, and no payload, clear entire namespace
             Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
             Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
+            ns.free_id=[];
+            ns.next_id=1;
           }
           // No namespace so no translation
           ids[i]=args.inputs[i].id;
@@ -213,17 +196,9 @@
               ns.n2e[name]=id;
             }
             else {
-              if(scan.payload.length){
                 // Id seen previously. Only push if payload is non emply
                 args.outputs.push(scan);
                 scan.id=name;
-              }
-              else {
-                // No payload remove the id/name from the tables, do not pass on message
-                delete ns.n2e[name];
-                delete ns.i2e[id];
-                //ns.free_id.push(id);
-              }
             }
           }
           else {
@@ -231,8 +206,9 @@
               // Id of 0, and no payload, clear entire namespace
               Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
               Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
+              ns.free_id=[];
+              ns.next_id=1;
             }
-
           }
         }
         else {

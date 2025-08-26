@@ -27,22 +27,24 @@ use Data::FastPack;
   ok $id2==$id, "Matching ids";
 
 
-  # unregister
-
-  $buffer="";
-  @output=();
-  encode_fastpack $buffer, [[0, "test/name", undef]], undef, $ns;
-
-  $id=id_for_name $ns, "test/name";
-  ok !defined $id, "Encoding side name unregistered";
-
-  decode_fastpack $buffer, \@output, undef, $ns2;
-
-
-  ok @output==0, "Unregister filtered from output";
-
-  $id2=id_for_name $ns2, "test/name";
-  ok !defined $id2, "Decoding side name unregistred";
+  ###################################################################
+  # # unregister                                                    #
+  #                                                                 #
+  # $buffer="";                                                     #
+  # @output=();                                                     #
+  # encode_fastpack $buffer, [[0, "test/name", undef]], undef, $ns; #
+  #                                                                 #
+  # $id=id_for_name $ns, "test/name";                               #
+  # ok !defined $id, "Encoding side name unregistered";             #
+  #                                                                 #
+  # decode_fastpack $buffer, \@output, undef, $ns2;                 #
+  #                                                                 #
+  #                                                                 #
+  # ok @output==0, "Unregister filtered from output";               #
+  #                                                                 #
+  # $id2=id_for_name $ns2, "test/name";                             #
+  # ok !defined $id2, "Decoding side name unregistred";             #
+  ###################################################################
 
 }
 

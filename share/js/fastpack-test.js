@@ -84,16 +84,18 @@ console.log(fastpack);
   console.log("Float value output", view.getFloat64(0,1));
 
 
-  //Remove ns entry
-  console.log("REMOVE ENTRY");
-  args={buffer:undefined, inputs:[{time:0 , id: "testtest", payload: new Uint8Array(0)}],ns:e_ns};
-  e=fastpack.encode_message(args);
-  console.log("input:",args);
-
-  outputs=[];
-  d_args={buffer:args.buffer, outputs:outputs, ns:d_ns};
-  d=fastpack.decode_message(d_args);
-  console.log("output:",d_args);
+  /****************************************************************************************************/
+  /* //Remove ns entry                                                                                */
+  /* console.log("REMOVE ENTRY");                                                                     */
+  /* args={buffer:undefined, inputs:[{time:0 , id: "testtest", payload: new Uint8Array(0)}],ns:e_ns}; */
+  /* e=fastpack.encode_message(args);                                                                 */
+  /* console.log("input:",args);                                                                      */
+  /*                                                                                                  */
+  /* outputs=[];                                                                                      */
+  /* d_args={buffer:args.buffer, outputs:outputs, ns:d_ns};                                           */
+  /* d=fastpack.decode_message(d_args);                                                               */
+  /* console.log("output:",d_args);                                                                   */
+  /****************************************************************************************************/
 }
 
 
