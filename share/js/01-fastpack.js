@@ -77,12 +77,13 @@
         else {
           if(args.inputs[i].payload.length==0){
             // Id of 0, and no payload, clear entire namespace
+            //console.log("ID of 0 and no payload, CLEAR THE NAMESPACE");
             Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
             Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
             ns.free_id=[];
             ns.next_id=1;
           }
-          // No namespace so no translation
+          // This should be a 0
           ids[i]=args.inputs[i].id;
         }
       }
@@ -186,7 +187,7 @@
 
 
         if(ns ){
-          if(scan.id){
+          if(scan.id!=0){
             let id=scan.id;
             let name=ns.i2e[id];
             if(name == undefined){
@@ -203,11 +204,17 @@
           }
           else {
             if(scan.payload.length==0){
+              //console.log("ID of 0 and no payload, CLEAR THE NAMESPACE");
               // Id of 0, and no payload, clear entire namespace
               Object.keys(ns.n2e).forEach(key => delete ns.n2e[key]); 
               Object.keys(ns.i2e).forEach(key => delete ns.i2e[key]); 
               ns.free_id=[];
               ns.next_id=1;
+            }
+            else {
+
+              //console.log("ID of 0 and WITH payload, META DATA");
+              args.outputs.push(scan);
             }
           }
         }
