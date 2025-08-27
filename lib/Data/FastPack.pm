@@ -2,7 +2,7 @@ package Data::FastPack;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.2";
+our $VERSION="v0.3.0";
 
 use feature ":all";
 no warnings "experimental";
