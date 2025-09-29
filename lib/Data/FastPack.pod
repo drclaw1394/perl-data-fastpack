@@ -10,9 +10,6 @@ streams of data, with arbitrary name data channels.
 This document also defines the FastPack format 
 
 
-
-
-
 =head1 CONCEPTS 
 
 The message format is primarily intended to store a sequence of time indexed
@@ -21,20 +18,19 @@ a sensor to position where both the sensor and the position are sampled
 separately, but can be stored with the same time base.
 
 
-Its small footprint and easy encoding/decoding also make is a great format for
+It's small footprint and easy encoding/decoding also make is a great format for
 IPC.
 
-It optionally (but highly recommended ) support name aliasing for messages.
+It optionally (but highly recommended ) supports name aliasing for messages.
 This saves bytes in storage or transmission, by dynamically assigning a integer
 value to a message ID during encoding. The management of mappings is automatic
 and inserted into the stream of encoded messages. This makes it seamless for
-the decoder to reconstruct the named message
+the decoder to reconstruct the named message.
 
-There is only one reserved channel id, 0 , which is a meta data channel and as
-a structure data transport at the application level. This channel payload is
-JSON or MessagePack encoded.  If no payload is present, this is a namespace
-reset, which will remove named id mappings so new ones can be generated from
-future data
+There is only one reserved channel id, 0 , which is a meta data channel for
+application level.  This channel payload is JSON or MessagePack encoded.  If no
+payload is present, this is a namespace reset, which will remove named id
+mappings so new ones can be generated from future data
 
 The meta data semantics are application dependant, giving great flexibility, in
 time base, channel relationships etc
@@ -138,23 +134,23 @@ JSON or MessagePack also.
 =head1 NAMED IDs
 
 Static IDs are simple for small closed systems. However for larger system,
-using dynamic ids allows the scoping.  The mapping between names and ids is
-automatically applied when using a name space. Encoding a named id for the
-first time will in insert a entry in the local encoding side table. It will
-also inject a message with  the dynamic id and payload of the name into the
-stream.  This will be the first time this id is seen, and is a marker to update
-the decoding end of the system.
+using dynamic ids allows scoping.  The mapping between names and ids is
+automatically applied when using a name space. 
 
-If a named message with no payload encoded, this serves as a deregistration of
-the id and adds it to a pool of reusable ids.
+Encoding a named id for the first time will in insert a entry in the local
+encoding side table. It will also inject a message with  the dynamic id and
+payload of the name into the stream.  This will be the first time this id is
+seen, and is a marker to update the decoding end of the system.
 
-A message with id 0 and no payload, deregisters all (clears) the name space.
+Messages with id "0" are never subject to named id lookup.
 
-For a bidirectional link, 4 name spaces are actually use. The encoding end of
-each direction is the master in that direction. The ids likely don't match, but
-they don't need to. The decoding end of each direction is shadow/slave copy of
-the encoding table. Over a reliable transport, these tables will always be in
-sync with the master from the encoding end. 
+A message with id 0 and no payload, de-registers all (clears) the name space
+
+For a bidirectional link, as an example, 4 name spaces are actually used. The
+encoding end of each direction is the master in that direction. The ids likely
+don't match, but they don't need to. The decoding end of each direction is
+shadow/slave copy of the encoding table. Over a reliable transport, these
+tables will always be in sync with the master from the encoding end. 
 
 =head1 FASTPACK FORMAT SUMMARY
 
@@ -222,6 +218,13 @@ provided  (even if undefended) to use this argument.
 Namespace if prevented from using C<0>, C<"0">, or C<undef> as names. Messages
 with these names issue a warning.
 
+If a C<$namespace> is utilised, the ID/name  of the message can be any string.
+It is mapped to an integer code. If the message is the first one to use the
+ID, an extra message mapping the integer to the name (id becomes the integer
+value, payload becomes the name), in inserted into the output. 
+
+If the message has and ID of "0", and a payload with no length, this resets the
+mappings in the namespace and is output as normal
 
 
 =head3 decode_fastpack
@@ -239,11 +242,14 @@ If C<$limit> is provided, this is the maximum number of messages to decode
 during a single call. If not provided or undef, 4096 is the default.
 
 
-C<$namespace> if provided enables named ids. decoded messages have the id
-mapped to a name stored in the names space. Special namespace update messages
-manipulate the namespace table to ensure it is copy of the  encoding end of the
-stream
+C<$namespace> if provided, int  enables named ids. Decoded messages have the id
+mapped to a name stored in the names space. If its the id has not been
+encountered before, it uses the payload as the name to update the internal
+mapping. This message is not sent to the output, as it is intended to update
+the mapping only.
 
+If the message has and ID of "0", and a payload with no length, this resets the
+mappings in the namespace and is not forward past the decoder
 
 =head2 Namspaces
 
@@ -275,7 +281,7 @@ Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
 
 =head1 REPOSITORTY and BUGS
 
-Please report any bugs via git hub: L<http://github.com/drclaw1394/perl-data-fastpack>
+Please report any bugs via git hub: L<https://github.com/drclaw1394/perl-data-fastpack>
 
 
 =head1 COPYRIGHT AND LICENSE
